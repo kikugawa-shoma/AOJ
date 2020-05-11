@@ -1,7 +1,7 @@
 cnt=0
 def increment():
-    global cnt
-    cnt+=1
+    print(cnt)
+    cnt += 1
 
-increment()
+print(increment())
 print(cnt)
