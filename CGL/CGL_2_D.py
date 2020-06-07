@@ -2,7 +2,7 @@ EPS = 10**(-9)
 def is_equal(a,b):
     return abs(a-b) < EPS
 
-def norm(v,i):
+def norm(v,i=2):
     import math
     ret = 0
     n = len(v)
@@ -129,7 +129,7 @@ class Vector(list):
                 ret[0],ret[1],ret[2] = x[1]*y[2]-x[2]*y[1],x[2]*y[0]-x[0]*y[2],x[0]*y[1]-x[1]*y[0]
             ret = Vector(ret)
             if n == 2:
-                return ret.norm(2)
+                return ret
             else:
                 return ret
 
@@ -140,46 +140,130 @@ class Segment:
     def __init__(self,v1,v2):
         self.v1 = v1
         self.v2 = v2
+    
+    def length(self):
+        return norm(self.v1-self.v2)
 
     def get_unit_vec(self):
-        return (self.v2-self.v1)/norm(self.v2-self.v1,2)
+        #方向単位ベクトル
+        dist = norm(self.v2-self.v1)
+        if dist != 0:
+            return (self.v2-self.v1)/dist
+        else:
+            return False
     
     def projection(self,vector):
+        #射影点(線分を直線と見たときの)
         unit_vec = self.get_unit_vec()
         t = unit_vec*(vector-self.v1)
         return self.v1 + t*unit_vec
     
     def is_vertical(self,other):
+        #線分の直交判定
         return is_equal(0,self.get_unit_vec()*other.get_unit_vec())
     
     def is_horizontal(self,other):
+        #線分の平行判定
         return is_equal(0,self.get_unit_vec()**other.get_unit_vec())
     
     def reflection(self,vector):
+        #反射点(線分を直線と見たときの)
         projection = self.projection(vector)
         v = projection - vector
         return projection + vector
+    
+    def include(self,vector):
+        #線分が点を含むか否か
+        proj = self.projection(vector)
+        if not is_equal(norm(proj-vector),0):
+            return False
+        else:
+            n = len(self.v1)
+            f = True
+            for i in range(n):
+                f &= ((self.v1[i] <= vector[i] <= self.v2[i]) or (self.v2[i] <= vector[i] <=self.v1[i]))
+            return f
+    
+    def distance(self,other):
+        #点と線分の距離
+        if isinstance(other,Vector):
+            proj = self.projection(other)
+            if self.include(proj):
+                return norm(proj-other)
+            else:
+                ret = []
+                ret.append(norm(self.v1-other))
+                ret.append(norm(self.v2-other))
+                return min(ret)
+
+    def ccw(self,vector):
+        """
+        線分に対して点が反時計回りの位置にある(1)か時計回りの位置にある(-1)か線分上にある(0)か
+        """
+        direction = self.v2 - self.v1
+        v = vector - self.v1
+        if self.include(vector):
+            return 0
+        else:
+            cross = direction**v
+            if cross[2] <= 0:
+                return 1
+            else:
+                return -1
+    
+    def intersect(self,segment):
+        """
+        線分の交差判定
+        """
+        ccw12 = self.ccw(segment.v1)
+        ccw13 = self.ccw(segment.v2)
+        ccw20 = segment.ccw(self.v1)
+        ccw21 = segment.ccw(self.v2)
+        
+        if ccw12*ccw13*ccw20*ccw21 == 0:
+            return True
+        else:
+            if ccw12*ccw13 < 0 and ccw20*ccw21 < 0:
+                return True
+            else:
+                return False
 
 class Line(Segment):
     """
     直線クラス
     """
-    pass
-
+    #直線上に点が存在するか否か
+    def include(self,vector):
+        proj = self.projection(vector)
+        return is_equal(norm(proj-vector),0)
 
 q = int(input())
-for _ in range(q):
+ps =[[[0] for _ in range(4)] for _ in range(q)]
+for i in range(q):
     tmp = list(map(int,input().split()))
-    vectors = [0]*4
     for j in range(4):
-        vectors[j] = Vector(tmp[j*2:(j+1)*2])
-    l1 = Line(vectors[0],vectors[1])
-    l2 = Line(vectors[2],vectors[3])
+        ps[i][j] = Vector(tmp[2*j:2*(j+1)])
 
-    if l1.is_horizontal(l2):
-        print(2)
-    elif l1.is_vertical(l2):
-        print(1)
+for i in range(q):
+    ans = []
+    p0,p1,p2,p3 = ps[i]
+    S1 = Segment(p0,p1)
+    S2 = Segment(p2,p3)
+    if S1.intersect(S2):
+        ans.append(0)
     else:
-        print(0)
+        ans.append(S1.distance(p2))
+        ans.append(S1.distance(p3))
+        ans.append(S2.distance(p0))
+        ans.append(S2.distance(p1))
+    
+    print(min(ans))
+
+
+
+
+
+
+
+
 

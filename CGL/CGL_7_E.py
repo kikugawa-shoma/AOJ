@@ -318,41 +318,13 @@ class Circle():
                 to2 = self.r*Vector([math.cos(theta - alpha), math.sin(theta - alpha)])
                 return self.c+ to1, self.c + to2
 
-
-
-
-
-
-    
-
-
-
-
-            
-
-    
-if __name__ == "__main__":
-    A = Vector([1,0,0])
-    B = Vector([0,1,0])
-
-    #外積
-    print(A**B)
-    print(B**A)
-
-
-    seg = Segment(A,B)
-    #線分ABに点が含まれるか判定
-    inseg_p = Vector([0.5,0.5,0])
-    outseg_p = Vector([0,0.5,0])
-    print(seg.include(inseg_p))
-    print(seg.include(outseg_p))
-
-    #線分ABと点Pの距離
-    P = Vector([0,0,0])
-    print(seg.distance(P))
-
-    L1 = Line(Vector([0,0]),Vector([1,1]))
-    L2 = Line(Vector([0,0]),Vector([-1,1]))
-    print(math.degrees(L1.angle()),math.degrees(L2.angle()))
-
-
+x1,y1,r1 = list(map(int,input().split()))
+x2,y2,r2 = list(map(int,input().split()))
+circle1 = Circle(Vector([x1,y1]), r1)
+circle2 = Circle(Vector([x2,y2]), r2)
+p1,p2 = circle1.intersect_point(circle2)
+if p2[0] < p1[0]:
+    p1,p2 = p2,p1
+elif p2[0] == p1[0]:
+    p1,p2 = p2,p1
+print("{:.7f} {:.7f} {:.7f} {:.7f}".format(*p1,*p2))

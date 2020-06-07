@@ -17,12 +17,11 @@ class Vector(list):
     +  : ベクトル和 
     -  : ベクトル差
     *  : スカラー倍、または内積
-    /  : スカラー除法
     ** : 外積
     += : ベクトル和
     -= : ベクトル差
     *= : スカラー倍
-    /= : スカラー除法
+    /= : スカラー倍
 
     メソッド
     self.norm(i) : L{i}ノルムを計算
@@ -141,6 +140,10 @@ class Segment:
         self.v1 = v1
         self.v2 = v2
 
+class Line(Segment):
+    """
+    直線クラス
+    """
     def get_unit_vec(self):
         return (self.v2-self.v1)/norm(self.v2-self.v1,2)
     
@@ -158,28 +161,18 @@ class Segment:
     def reflection(self,vector):
         projection = self.projection(vector)
         v = projection - vector
-        return projection + vector
-
-class Line(Segment):
-    """
-    直線クラス
-    """
-    pass
+        return projection + v
 
 
+xp1,yp1,xp2,yp2 = map(float,input().split())
 q = int(input())
-for _ in range(q):
-    tmp = list(map(int,input().split()))
-    vectors = [0]*4
-    for j in range(4):
-        vectors[j] = Vector(tmp[j*2:(j+1)*2])
-    l1 = Line(vectors[0],vectors[1])
-    l2 = Line(vectors[2],vectors[3])
+ps = [list(map(int,input().split())) for i in range(q)]
 
-    if l1.is_horizontal(l2):
-        print(2)
-    elif l1.is_vertical(l2):
-        print(1)
-    else:
-        print(0)
+p1 = Vector([xp1,yp1])
+p2 = Vector([xp2,yp2])
+L = Line(p1,p2)
 
+for p in ps:
+    ans = L.reflection(p)
+    ans = [float(round(a,11)) for a in ans]
+    print(*ans)

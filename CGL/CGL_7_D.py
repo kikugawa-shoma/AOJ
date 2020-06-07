@@ -132,23 +132,6 @@ class Vector(list):
                 return ret
             else:
                 return ret
-    def angle(self):
-        if len(self) != 2:
-            return False
-        else:
-            if is_equal(super().__getitem__(0), 0) and is_equal(super().__getitem__(1), 0):
-                return False
-            elif is_equal(super().__getitem__(0), 0):
-                if super().__getitem__(1) > 0:
-                    return math.pi/2
-                elif super().__getitem__(1) < 0:
-                    return -math.pi/2
-            else:
-                if super().__getitem__(0) > 0:
-                    return math.atan(super().__getitem__(1)/super().__getitem__(0))
-                elif super().__getitem__(0) < 0:
-                    return math.atan(super().__getitem__(1)/super().__getitem__(0)) + math.pi
-
 
 class Segment:
     """
@@ -168,8 +151,6 @@ class Segment:
     intersect_point          :
     """
     def __init__(self,v1,v2):
-        if v2[0] < v1[0]:
-            v1,v2 = v2,v1
         self.v1 = v1
         self.v2 = v2
     
@@ -268,13 +249,6 @@ class Segment:
         d1 = norm(self.projection(segment.v1) - segment.v1)
         d2 = norm(self.projection(segment.v2) - segment.v2)
         return segment.v1 + (d1/(d1 + d2)) * (segment.v2 - segment.v1)
-    
-    def angle(self):
-        if is_equal(self.v2[0] - self.v1[0], 0):
-            return math.pi/2
-        else:
-            return math.atan((self.v2[1] - self.v1[1])/(self.v2[0] - self.v1[0]))
-
 
 
 class Line(Segment):
@@ -296,7 +270,7 @@ class Circle():
         self.r = r
     
     def intersect_point(self,other):
-        if isinstance(other, Line):
+        if isinstance(other,Line):
             if other.distance(self.c) > self.r:
                 return False
             else:
@@ -306,53 +280,17 @@ class Circle():
                 t = (self.r**2 - d**2)**0.5
                 return proj + t*unit_v, proj - t*unit_v
 
-        if isinstance(other,Circle):
-            if norm(self.c - other.c) > self.r + other.r:
-                return False
-            else:
-                d = norm(self.c - other.c)
-                alpha = math.acos((self.r**2 + d**2 - other.r**2)/(2*d*self.r))
-                V = other.c - self.c
-                theta = V.angle()
-                to1 = self.r*Vector([math.cos(theta + alpha), math.sin(theta + alpha)])
-                to2 = self.r*Vector([math.cos(theta - alpha), math.sin(theta - alpha)])
-                return self.c+ to1, self.c + to2
 
+cx,cy,r = map(int,input().split())
+circle = Circle(Vector([cx,cy]),r)
+q = int(input())
+lines = [0]*q
+for i in range(q):
+    x1,y1,x2,y2 = map(int,input().split())
+    lines[i] = Line(Vector([x1,y1]),Vector([x2,y2]))
 
-
-
-
-
-    
-
-
-
-
-            
-
-    
-if __name__ == "__main__":
-    A = Vector([1,0,0])
-    B = Vector([0,1,0])
-
-    #外積
-    print(A**B)
-    print(B**A)
-
-
-    seg = Segment(A,B)
-    #線分ABに点が含まれるか判定
-    inseg_p = Vector([0.5,0.5,0])
-    outseg_p = Vector([0,0.5,0])
-    print(seg.include(inseg_p))
-    print(seg.include(outseg_p))
-
-    #線分ABと点Pの距離
-    P = Vector([0,0,0])
-    print(seg.distance(P))
-
-    L1 = Line(Vector([0,0]),Vector([1,1]))
-    L2 = Line(Vector([0,0]),Vector([-1,1]))
-    print(math.degrees(L1.angle()),math.degrees(L2.angle()))
-
-
+for i in range(q):
+    ic1,ic2 = circle.intersect_point(lines[i])
+    ics = [ic1,ic2]
+    ics.sort()
+    print("{:.7f} {:.7f} {:.7f} {:.7f}".format(*ics[0],*ics[1]))

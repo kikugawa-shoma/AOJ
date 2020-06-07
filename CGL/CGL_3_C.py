@@ -1,3 +1,6 @@
+"""
+TLE
+"""
 import math
 EPS = 10**(-9)
 def is_equal(a,b):
@@ -318,41 +321,65 @@ class Circle():
                 to2 = self.r*Vector([math.cos(theta - alpha), math.sin(theta - alpha)])
                 return self.c+ to1, self.c + to2
 
+n = int(input())
+G = [0]*n
+slided_G = [0]*n
+Ps = [0]*n
+slided_Ps = [0]*n
+for i in range(n):
+    Ps[i] = Vector(list(map(int,input().split())))
+    slided_Ps[i] = Ps[i] + Vector([0,0.00001])
+q = int(input())
+query = [0]*q
+for i in range(q):
+    query[i] = Vector(list(map(int,input().split())))
+
+for i in range(n):
+    if i == n-1:
+        G[i] = Segment(Ps[i],Ps[0])
+        slided_G[i] = Segment(slided_Ps[i],slided_Ps[0])
+    else:
+        G[i] = Segment(Ps[i],Ps[i+1])
+        slided_G[i] = Segment(slided_Ps[i],slided_Ps[i+1])
+
+limit_x = 10010
+intersect = [0]*q
+on_G = [False]*q
+for i in range(q):
+    half_line = Segment(query[i],Vector([limit_x,query[i][1]]))
+    for j in range(n):
+        if G[j].include(query[i]):
+            on_G[i] = True
+            break
+        a = slided_G[j].v1 - query[i]
+        b = slided_G[j].v2 - query[i]
+        if a[1] > b[1]:
+            a,b = b,a
+        cross = a**b
+        if (cross[2] > 0) & (half_line.ccw(slided_G[j].v1)*half_line.ccw(slided_G[j].v2) < 0):
+            intersect[i] += 1
 
 
+for i in range(q):
+    if on_G[i]:
+        print(1)
+    elif intersect[i] % 2 == 1:
+        print(2)
+    else:
+        print(0)
 
+"""
+4
+-10000 -10000
+10000 -9999
+9999 10000
+-10000 9999
+2
+9999 -9999
+9998 10000
 
-
-    
-
-
-
-
-            
-
-    
-if __name__ == "__main__":
-    A = Vector([1,0,0])
-    B = Vector([0,1,0])
-
-    #外積
-    print(A**B)
-    print(B**A)
-
-
-    seg = Segment(A,B)
-    #線分ABに点が含まれるか判定
-    inseg_p = Vector([0.5,0.5,0])
-    outseg_p = Vector([0,0.5,0])
-    print(seg.include(inseg_p))
-    print(seg.include(outseg_p))
-
-    #線分ABと点Pの距離
-    P = Vector([0,0,0])
-    print(seg.distance(P))
-
-    L1 = Line(Vector([0,0]),Vector([1,1]))
-    L2 = Line(Vector([0,0]),Vector([-1,1]))
-    print(math.degrees(L1.angle()),math.degrees(L2.angle()))
+2
+0
+"""
 
 
