@@ -22,14 +22,13 @@
 			"int(input()) $1",
 		],
 		"description": "int input"
-	}
+	},
 	"MapInput":{
 		"scope": "python",
 		"prefix": "map",
 		"body": [
 			"map(int,input().split())",
-			"$1",
-		]
+		],
 		"description": "map input"
 	}
 

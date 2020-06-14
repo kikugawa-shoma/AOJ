@@ -13,4 +13,3 @@ for h in range(1,H+1):
 
 print(max([max(x) for x in dp])**2)
 
-        
